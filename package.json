@@ -3,6 +3,10 @@
   "version": "0.0.0",
   "type": "module",
   "homepage": "https://pg-nuxtui.netlify.app",
+  "engines": {
+    "node": ">=22 <25",
+    "npm": ">=10"
+  },
   "repository": {
     "type": "git",
     "url": "https://github.com/pinegrow/pg-nuxtui.git"
