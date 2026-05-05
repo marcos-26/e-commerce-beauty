@@ -1,42 +1,330 @@
 <script setup lang="ts">
-  import { heroImageUrl } from '@/utils/hero'
+  import bannerImage from '@/assets/images/banner.png'
+  import bannerImage2 from '@/assets/images/banner2.png'
+  import logoImage from '@/assets/images/logo.png'
 
   definePageMeta({
-    // layout: 'default',
-    // name: 'index',
-    // alias: 'index',
-    title: 'Home',
-    description: 'New Arrivals, Big Savings!',
-    navOrder: 1,
-    type: 'primary',
-    icon: 'i-mdi-home',
-    // ogImage: 'images/ogImage.png', // url or local images inside public folder, for eg, ~/public/images/ogImage.png
+    layout: false,
+    title: 'Inicio',
+    description: 'Cilios Marketplace',
   })
 
-  const { optimizeImage } = useOptimizeImage()
-  const heroImageOptimized = {
-    alt: `hero`,
-    cover: true,
-    ...optimizeImage(
-      heroImageUrl,
-      /* options */
-      {
-        // placeholder: false, // placeholder image before the actual image is fully loaded.
-      },
-      true /* return bgStyles */,
-    ),
-  }
+  useHead({
+    bodyAttrs: {
+      class: 'bg-[#f6f8fd]',
+    },
+  })
 
-  const heroImage = heroImageOptimized.src
-  const bgStyles = heroImageOptimized.bgStyles
+  const categories = [
+    'Alongamento de Cilios',
+    'Kits',
+    'Pincas',
+    'Colas',
+    'Removedores',
+    'Higiene',
+    'Acessorios',
+    'Outros',
+  ]
+
+  const navItems = [...categories.slice(0, 7), 'Ofertas']
+
+  const activeHeroSlide = ref(0)
+
+  const heroSlides = [
+    {
+      image: bannerImage,
+      alt: 'Tudo para realcar a beleza do olhar',
+    },
+    {
+      image: bannerImage2,
+      alt: 'Ofertas especiais para cilios',
+    },
+    {
+      image: bannerImage,
+      alt: 'Produtos para alongamento de cilios',
+    },
+    {
+      image: bannerImage2,
+      alt: 'Cilios Marketplace',
+    },
+  ]
+
+  const benefits = [
+    {
+      title: 'Frete Gratis',
+      text: 'acima de R$199',
+      icon: 'i-lucide-truck',
+    },
+    {
+      title: 'Parcele em ate',
+      text: '6x sem juros',
+      icon: 'i-lucide-credit-card',
+    },
+    {
+      title: '5% de Desconto',
+      text: 'no pix',
+      icon: 'i-lucide-badge-percent',
+    },
+    {
+      title: 'Entrega rapida',
+      text: 'para todo o Brasil',
+      icon: 'i-lucide-package-check',
+    },
+    {
+      title: 'Compra Segura',
+      text: 'seus dados protegidos',
+      icon: 'i-lucide-lock-keyhole',
+    },
+  ]
+
+  const products = [
+    {
+      name: 'Cola Ultra Rapida Expert',
+      price: 'R$ 49,90',
+      installment: '6x de R$ 8,32 sem juros',
+      position: '87% 53%',
+      size: '540%',
+      rating: 5,
+    },
+    {
+      name: 'Kit Alongamento Volume',
+      price: 'R$ 159,90',
+      installment: '6x de R$ 26,65 sem juros',
+      position: '68% 47%',
+      size: '360%',
+      rating: 5,
+    },
+    {
+      name: 'Pinca Volume Russo',
+      price: 'R$ 39,90',
+      installment: '6x de R$ 6,65 sem juros',
+      position: '82% 43%',
+      size: '520%',
+      rating: 4,
+    },
+    {
+      name: 'Cilios Volume 5D',
+      price: 'R$ 29,90',
+      installment: '6x de R$ 4,98 sem juros',
+      position: '61% 45%',
+      size: '500%',
+      rating: 5,
+    },
+    {
+      name: 'Removedor em Gel',
+      price: 'R$ 39,90',
+      installment: '6x de R$ 6,68 sem juros',
+      position: '96% 55%',
+      size: '460%',
+      rating: 4,
+    },
+  ]
 </script>
+
 <template>
-  <div>
-    <HeroSection />
-    <UContainer class="pt-8">
-      <LaunchSale class="mt-8" />
-      <HotDeals class="mt-8" />
-    </UContainer>
+  <div class="min-h-screen bg-[#f6f8fd] text-slate-800">
+    <header class="bg-white/90 shadow-sm shadow-slate-200/70">
+      <div
+        class="mx-auto flex max-w-7xl flex-col gap-5 px-4 py-5 md:px-6 lg:flex-row lg:items-center lg:gap-10"
+      >
+        <NuxtLink to="/" class="flex shrink-0 justify-center lg:justify-start">
+          <img
+            :src="logoImage"
+            alt="Cilios Marketplace"
+            class="h-20 w-44 object-contain md:h-24 md:w-52"
+          />
+        </NuxtLink>
+
+        <form class="flex min-w-0 flex-1 overflow-hidden rounded border border-slate-200 bg-white shadow-sm">
+          <input
+            class="h-12 min-w-0 flex-1 border-0 px-4 text-sm text-slate-700 outline-none placeholder:text-slate-400"
+            placeholder="O que voce procura?"
+            type="search"
+          />
+          <button
+            aria-label="Buscar"
+            class="flex h-12 w-14 items-center justify-center bg-[#d72d91] text-white transition hover:bg-[#bf247e]"
+            type="submit"
+          >
+            <span class="i-lucide-search h-6 w-6"></span>
+          </button>
+        </form>
+
+        <div class="flex items-center justify-center gap-7 lg:justify-end">
+          <button class="flex items-center gap-3 text-left" type="button">
+            <span
+              class="i-lucide-circle-user-round h-9 w-9 text-[#d72d91]"
+            ></span>
+            <span class="leading-tight">
+              <span class="block text-xs font-medium text-[#c73891]">
+                Entre ou cadastre-se
+              </span>
+              <span class="flex items-center gap-1 text-sm font-semibold">
+                Minha conta
+                <span class="i-lucide-chevron-down h-4 w-4"></span>
+              </span>
+            </span>
+          </button>
+
+          <button class="relative text-slate-900" type="button" aria-label="Carrinho">
+            <span class="i-lucide-shopping-cart h-9 w-9"></span>
+            <span
+              class="absolute -right-3 -top-3 flex h-6 w-6 items-center justify-center rounded-full bg-[#d72d91] text-xs font-bold text-white"
+            >
+              0
+            </span>
+          </button>
+        </div>
+      </div>
+
+      <nav class="bg-[#d72d91]">
+        <div
+          class="mx-auto flex max-w-7xl gap-1 overflow-x-auto px-4 text-sm font-semibold text-white md:justify-between md:px-6"
+        >
+          <NuxtLink
+            v-for="item in ['Inicio', ...navItems]"
+            :key="item"
+            to="/"
+            class="shrink-0 px-4 py-3.5 transition hover:bg-white/15"
+          >
+            {{ item }}
+          </NuxtLink>
+        </div>
+      </nav>
+    </header>
+
+    <main class="mx-auto max-w-7xl px-4 py-6 md:px-6">
+      <section class="grid gap-6 lg:grid-cols-[230px_minmax(0,1fr)]">
+        <aside
+          class="overflow-hidden rounded border border-slate-200 bg-white shadow-sm"
+        >
+          <div class="flex items-center gap-3 bg-[#d72d91] px-5 py-4 text-white">
+            <span class="i-lucide-menu h-6 w-6"></span>
+            <span class="font-semibold">Categorias</span>
+          </div>
+          <NuxtLink
+            v-for="category in categories"
+            :key="category"
+            to="/"
+            class="flex items-center justify-between border-b border-slate-100 px-5 py-3 text-sm text-slate-600 last:border-b-0 hover:bg-pink-50 hover:text-[#c72786]"
+          >
+            {{ category }}
+            <span class="i-lucide-chevron-right h-4 w-4 text-slate-400"></span>
+          </NuxtLink>
+        </aside>
+
+        <div>
+          <div
+            class="relative overflow-hidden rounded border border-pink-100 bg-pink-100 shadow-sm"
+          >
+            <img
+              :key="heroSlides[activeHeroSlide].image"
+              :src="heroSlides[activeHeroSlide].image"
+              :alt="heroSlides[activeHeroSlide].alt"
+              class="h-full min-h-[250px] w-full object-cover transition-opacity duration-300"
+            />
+            <NuxtLink
+              to="/"
+              class="absolute bottom-[13%] left-[5%] rounded bg-[#d72d91] px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-[#bf247e]"
+            >
+              COMPRE AGORA
+            </NuxtLink>
+            <div
+              class="absolute bottom-3 left-1/2 flex -translate-x-1/2 gap-2"
+              aria-label="Selecionar banner"
+            >
+              <button
+                v-for="(_, index) in heroSlides"
+                :key="index"
+                type="button"
+                :aria-label="`Mostrar banner ${index + 1}`"
+                :aria-current="activeHeroSlide === index"
+                class="h-3 w-3 rounded-full transition hover:scale-110"
+                :class="
+                  activeHeroSlide === index
+                    ? 'bg-[#d72d91]'
+                    : 'bg-white/80 hover:bg-[#d72d91]/60'
+                "
+                @click="activeHeroSlide = index"
+              ></button>
+            </div>
+          </div>
+
+          <div
+            class="grid gap-4 py-6 sm:grid-cols-2 lg:grid-cols-5"
+            aria-label="Vantagens da loja"
+          >
+            <div
+              v-for="benefit in benefits"
+              :key="benefit.title"
+              class="flex items-center gap-3"
+            >
+              <span :class="[benefit.icon, 'h-8 w-8 text-[#d72d91]']"></span>
+              <span class="leading-tight">
+                <span class="block text-sm font-semibold text-slate-800">
+                  {{ benefit.title }}
+                </span>
+                <span class="text-xs text-slate-500">{{ benefit.text }}</span>
+              </span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="pb-10 pt-2">
+        <div class="mb-5 flex items-center justify-between">
+          <h2 class="mb-0 text-xl font-bold text-slate-900 md:text-2xl">
+            Mais Vendidos
+          </h2>
+          <NuxtLink to="/" class="text-sm font-medium text-[#d72d91]">
+            Ver todos
+          </NuxtLink>
+        </div>
+
+        <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
+          <article
+            v-for="product in products"
+            :key="product.name"
+            class="rounded border border-slate-200 bg-white p-4 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
+          >
+            <div
+              class="mb-4 h-40 rounded bg-white bg-no-repeat"
+              :style="{
+                backgroundImage: `url(${bannerImage})`,
+                backgroundPosition: product.position,
+                backgroundSize: product.size,
+              }"
+              role="img"
+              :aria-label="product.name"
+            ></div>
+            <h3 class="mb-1 text-sm font-medium leading-snug text-slate-700">
+              {{ product.name }}
+            </h3>
+            <p class="text-lg font-bold text-slate-950">{{ product.price }}</p>
+            <p class="text-xs text-slate-500">{{ product.installment }}</p>
+            <div class="mt-2 flex text-[#f2a32b]" aria-label="Avaliacao">
+              <span
+                v-for="star in 5"
+                :key="star"
+                :class="[
+                  star <= product.rating
+                    ? 'i-lucide-star fill-current'
+                    : 'i-lucide-star',
+                  'h-4 w-4',
+                ]"
+              ></span>
+            </div>
+          </article>
+        </div>
+      </section>
+    </main>
+
+    <NuxtLink
+      to="/contact-us"
+      class="fixed bottom-6 right-6 flex h-16 w-16 items-center justify-center rounded-full bg-[#20b15a] text-white shadow-lg shadow-emerald-900/20 transition hover:bg-[#19984b]"
+      aria-label="WhatsApp"
+    >
+      <span class="i-lucide-message-circle h-9 w-9"></span>
+    </NuxtLink>
   </div>
 </template>
-<style scoped></style>
