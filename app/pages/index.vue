@@ -1,4 +1,8 @@
 <script setup lang="ts">
+  import type {
+    MarketplaceCategory,
+    MarketplaceProduct,
+  } from '@/composables/marketplace-api'
   import bannerImage from '@/assets/images/banner.png'
   import bannerImage2 from '@/assets/images/banner2.png'
   import logoImage from '@/assets/images/logo.png'
@@ -15,7 +19,7 @@
     },
   })
 
-  const categories = [
+  const fallbackCategories = [
     'Alongamento de Cilios',
     'Kits',
     'Pincas',
@@ -26,7 +30,25 @@
     'Outros',
   ]
 
-  const navItems = [...categories.slice(0, 7), 'Ofertas']
+  const { data: apiCategories } = await useAsyncData('marketplace-categories', () =>
+    $fetch<MarketplaceCategory[]>(
+      `${useRuntimeConfig().public.apiBase}/categories`,
+    ).catch(() => []),
+  )
+
+  const { data: apiProducts } = await useAsyncData('marketplace-products', () =>
+    $fetch<MarketplaceProduct[]>(
+      `${useRuntimeConfig().public.apiBase}/products`,
+    ).catch(() => []),
+  )
+
+  const categories = computed(() =>
+    apiCategories.value?.length
+      ? apiCategories.value.map((category) => category.name)
+      : fallbackCategories,
+  )
+
+  const navItems = computed(() => [...categories.value.slice(0, 7), 'Ofertas'])
 
   const activeHeroSlide = ref(0)
 
@@ -77,7 +99,7 @@
     },
   ]
 
-  const products = [
+  const fallbackProducts = [
     {
       name: 'Cola Ultra Rapida Expert',
       price: 'R$ 49,90',
@@ -119,6 +141,28 @@
       rating: 4,
     },
   ]
+
+  const money = (value: string | number) =>
+    new Intl.NumberFormat('pt-BR', {
+      style: 'currency',
+      currency: 'BRL',
+    }).format(Number(value))
+
+  const products = computed(() => {
+    if (!apiProducts.value?.length) {
+      return fallbackProducts
+    }
+
+    return apiProducts.value.map((product) => ({
+      name: product.name,
+      price: money(product.price),
+      installment: `6x de ${money(Number(product.price) / 6)} sem juros`,
+      image: product.image || '',
+      position: 'center',
+      size: 'contain',
+      rating: 5,
+    }))
+  })
 </script>
 
 <template>
@@ -151,7 +195,7 @@
         </form>
 
         <div class="flex items-center justify-center gap-7 lg:justify-end">
-          <button class="flex items-center gap-3 text-left" type="button">
+          <NuxtLink to="/login" class="flex items-center gap-3 text-left">
             <span
               class="i-lucide-circle-user-round h-9 w-9 text-[#d72d91]"
             ></span>
@@ -164,7 +208,7 @@
                 <span class="i-lucide-chevron-down h-4 w-4"></span>
               </span>
             </span>
-          </button>
+          </NuxtLink>
 
           <button class="relative text-slate-900" type="button" aria-label="Carrinho">
             <span class="i-lucide-shopping-cart h-9 w-9"></span>
@@ -290,7 +334,7 @@
             <div
               class="mb-4 h-40 rounded bg-white bg-no-repeat"
               :style="{
-                backgroundImage: `url(${bannerImage})`,
+                backgroundImage: `url(${product.image || bannerImage})`,
                 backgroundPosition: product.position,
                 backgroundSize: product.size,
               }"
