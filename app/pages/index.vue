@@ -78,6 +78,81 @@
       : fallbackCategories,
   )
 
+  const categoryOptions: Record<string, string[]> = {
+    'Alongamento de Cilios': [
+      'Fio a fio',
+      'Volume brasileiro',
+      'Volume russo',
+      'Mega volume',
+      'Efeito molhado',
+      'Anime / Manga lashes',
+      'Curvaturas C, D, L e M',
+      'Espessuras 0.03 a 0.20',
+    ],
+    Kits: [
+      'Kit iniciante',
+      'Kit profissional',
+      'Kit retencao',
+      'Kit lash lifting',
+      'Kit brow lamination',
+      'Combos promocionais',
+    ],
+    Pincas: [
+      'Pinca reta',
+      'Pinca curva',
+      'Pinca isolamento',
+      'Pinca volume russo',
+      'Pinca boot',
+      'Estojo para pincas',
+    ],
+    Colas: [
+      'Secagem rapida',
+      'Baixa ardencia',
+      'Cola preta',
+      'Cola transparente',
+      'Cola sensivel',
+      'Primer e acelerador',
+      'Controle de umidade',
+    ],
+    Removedores: [
+      'Removedor em gel',
+      'Removedor em creme',
+      'Removedor balm',
+      'Removedor liquido',
+      'Neutralizadores',
+    ],
+    Higiene: [
+      'Shampoo foam',
+      'Primer higienizador',
+      'Escovinhas descartaveis',
+      'Microbrush',
+      'Lenco sem fiapos',
+      'Biosseguranca',
+    ],
+    Acessorios: [
+      'Pads e fitas',
+      'Nano mister',
+      'Higrometro',
+      'Pedra jade',
+      'Anel bate cola',
+      'Espelho de precisao',
+      'Mapeamento de cilios',
+    ],
+    Outros: [
+      'Finalizadores e selantes',
+      'Lash lifting',
+      'Design de sobrancelhas',
+      'Treinamentos',
+      'Materiais descartaveis',
+      'Lancamentos',
+    ],
+  }
+
+  const expandedCategory = ref(fallbackCategories[0])
+
+  const optionsForCategory = (category: string) =>
+    categoryOptions[category] || categoryOptions.Outros
+
   const navItems = computed(() => [...categories.value.slice(0, 7), 'Ofertas'])
 
   const activeHeroSlide = ref(0)
@@ -131,6 +206,7 @@
 
   const fallbackProducts = [
     {
+      id: 1,
       name: 'Cola Ultra Rapida Expert',
       price: 'R$ 49,90',
       installment: '6x de R$ 8,32 sem juros',
@@ -139,6 +215,7 @@
       rating: 5,
     },
     {
+      id: 2,
       name: 'Kit Alongamento Volume',
       price: 'R$ 159,90',
       installment: '6x de R$ 26,65 sem juros',
@@ -147,6 +224,7 @@
       rating: 5,
     },
     {
+      id: 3,
       name: 'Pinca Volume Russo',
       price: 'R$ 39,90',
       installment: '6x de R$ 6,65 sem juros',
@@ -155,6 +233,7 @@
       rating: 4,
     },
     {
+      id: 4,
       name: 'Cilios Volume 5D',
       price: 'R$ 29,90',
       installment: '6x de R$ 4,98 sem juros',
@@ -163,6 +242,7 @@
       rating: 5,
     },
     {
+      id: 5,
       name: 'Removedor em Gel',
       price: 'R$ 39,90',
       installment: '6x de R$ 6,68 sem juros',
@@ -196,6 +276,8 @@
     checkoutStatus.value = ''
     await addItem(product.source)
   }
+
+  const productPath = (product: any) => `/store/${product.id || product.source?.id}`
 
   const finishCheckout = async () => {
     checkoutStatus.value = ''
@@ -290,15 +372,41 @@
             <span class="i-lucide-menu h-6 w-6"></span>
             <span class="font-semibold">Categorias</span>
           </div>
-          <NuxtLink
+          <div
             v-for="category in categories"
             :key="category"
-            to="/"
-            class="flex items-center justify-between border-b border-slate-100 px-5 py-3 text-sm text-slate-600 last:border-b-0 hover:bg-pink-50 hover:text-[#c72786]"
+            class="border-b border-slate-100 last:border-b-0"
           >
-            {{ category }}
-            <span class="i-lucide-chevron-right h-4 w-4 text-slate-400"></span>
-          </NuxtLink>
+            <button
+              type="button"
+              class="flex w-full items-center justify-between px-5 py-3 text-left text-sm text-slate-700 hover:bg-pink-50 hover:text-[#c72786]"
+              :aria-expanded="expandedCategory === category"
+              @click="expandedCategory = expandedCategory === category ? '' : category"
+            >
+              <span>{{ category }}</span>
+              <span
+                :class="[
+                  expandedCategory === category
+                    ? 'i-lucide-chevron-down'
+                    : 'i-lucide-chevron-right',
+                  'h-4 w-4 text-slate-400',
+                ]"
+              ></span>
+            </button>
+            <div
+              v-if="expandedCategory === category"
+              class="bg-slate-50 px-4 pb-3"
+            >
+              <NuxtLink
+                v-for="option in optionsForCategory(category)"
+                :key="option"
+                to="/"
+                class="block rounded px-3 py-2 text-xs font-medium text-slate-500 hover:bg-white hover:text-[#c72786]"
+              >
+                {{ option }}
+              </NuxtLink>
+            </div>
+          </div>
         </aside>
 
         <div>
@@ -375,38 +483,40 @@
             :key="product.name"
             class="rounded border border-slate-200 bg-white p-4 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
           >
-            <div
-              class="mb-4 h-40 rounded bg-white bg-no-repeat"
-              :style="{
-                backgroundImage: `url(${product.image || bannerImage})`,
-                backgroundPosition: product.position,
-                backgroundSize: product.size,
-              }"
-              role="img"
-              :aria-label="product.name"
-            ></div>
-            <h3 class="mb-1 text-sm font-medium leading-snug text-slate-700">
-              {{ product.name }}
-            </h3>
-            <p class="text-lg font-bold text-slate-950">{{ product.price }}</p>
-            <p class="text-xs text-slate-500">{{ product.installment }}</p>
-            <div class="mt-2 flex text-[#f2a32b]" aria-label="Avaliacao">
-              <span
-                v-for="star in 5"
-                :key="star"
-                :class="[
-                  star <= product.rating
-                    ? 'i-lucide-star fill-current'
-                    : 'i-lucide-star',
-                  'h-4 w-4',
-                ]"
-              ></span>
-            </div>
+            <NuxtLink :to="productPath(product)" class="block">
+              <div
+                class="mb-4 h-40 rounded bg-white bg-no-repeat"
+                :style="{
+                  backgroundImage: `url(${product.image || bannerImage})`,
+                  backgroundPosition: product.position,
+                  backgroundSize: product.size,
+                }"
+                role="img"
+                :aria-label="product.name"
+              ></div>
+              <h3 class="mb-1 text-sm font-medium leading-snug text-slate-700">
+                {{ product.name }}
+              </h3>
+              <p class="text-lg font-bold text-slate-950">{{ product.price }}</p>
+              <p class="text-xs text-slate-500">{{ product.installment }}</p>
+              <div class="mt-2 flex text-[#f2a32b]" aria-label="Avaliacao">
+                <span
+                  v-for="star in 5"
+                  :key="star"
+                  :class="[
+                    star <= product.rating
+                      ? 'i-lucide-star fill-current'
+                      : 'i-lucide-star',
+                    'h-4 w-4',
+                  ]"
+                ></span>
+              </div>
+            </NuxtLink>
             <button
               v-if="product.source"
               class="mt-4 flex h-10 w-full items-center justify-center gap-2 rounded bg-[#d72d91] px-3 text-sm font-semibold text-white transition hover:bg-[#bf247e]"
               type="button"
-              @click="addProductToCart(product)"
+              @click.stop="addProductToCart(product)"
             >
               <span class="i-lucide-shopping-cart h-4 w-4"></span>
               Adicionar
