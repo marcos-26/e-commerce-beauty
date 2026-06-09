@@ -1,6 +1,7 @@
 <script setup lang="ts">
   import type {
     MarketplaceCategory,
+    PaginatedResponse,
     MarketplaceProduct,
   } from '@/composables/marketplace-api'
   import bannerImage from '@/assets/images/banner.png'
@@ -36,10 +37,16 @@
     ).catch(() => []),
   )
 
-  const { data: apiProducts } = await useAsyncData('marketplace-products', () =>
-    $fetch<MarketplaceProduct[]>(
+  const { data: apiProductsResponse } = await useAsyncData('marketplace-products', () =>
+    $fetch<MarketplaceProduct[] | PaginatedResponse<MarketplaceProduct>>(
       `${useRuntimeConfig().public.apiBase}/products`,
     ).catch(() => []),
+  )
+
+  const apiProducts = computed(() =>
+    Array.isArray(apiProductsResponse.value)
+      ? apiProductsResponse.value
+      : apiProductsResponse.value?.data || [],
   )
 
   const {
@@ -166,7 +173,7 @@
   ]
 
   const products = computed(() => {
-    if (!apiProducts.value?.length) {
+    if (!apiProducts.value.length) {
       return fallbackProducts
     }
 

@@ -1,6 +1,7 @@
 <script setup lang="ts">
   import type {
     MarketplaceCategory,
+    PaginatedResponse,
     MarketplaceProduct,
   } from '@/composables/marketplace-api'
 
@@ -48,10 +49,10 @@
       await loadUser()
       const [categoryData, productData] = await Promise.all([
         request<MarketplaceCategory[]>('/categories'),
-        request<MarketplaceProduct[]>('/products'),
+        request<MarketplaceProduct[] | PaginatedResponse<MarketplaceProduct>>('/products'),
       ])
       categories.value = categoryData
-      products.value = productData
+      products.value = Array.isArray(productData) ? productData : productData.data
       if (!productForm.category_id) {
         productForm.category_id = categories.value[0]?.id?.toString() || ''
       }

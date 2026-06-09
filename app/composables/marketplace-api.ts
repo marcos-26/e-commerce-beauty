@@ -20,9 +20,31 @@ export type MarketplaceProduct = {
   name: string
   description?: string | null
   price: string | number
+  original_price?: string | number | null
   image?: string | null
   category_id: number
+  seller_store_id?: number | null
+  stock?: number
+  sold_count?: number
+  rating_average?: string | number
+  rating_count?: number
+  is_featured?: boolean
+  status?: string
   category?: MarketplaceCategory
+  store?: {
+    id: number
+    name: string
+    slug: string
+    is_official?: boolean
+  } | null
+}
+
+export type PaginatedResponse<T> = {
+  data: T[]
+  current_page: number
+  last_page: number
+  per_page: number
+  total: number
 }
 
 export type AbandonedCartItem = {
