@@ -5,6 +5,8 @@
   })
 
   const { register, token } = useMarketplaceApi()
+  const route = useRoute()
+  const redirectTo = computed(() => route.query.redirect?.toString() || '/admin')
   const form = reactive({
     name: '',
     email: '',
@@ -16,7 +18,7 @@
 
   onMounted(() => {
     if (token.value) {
-      navigateTo('/admin')
+      navigateTo(redirectTo.value)
     }
   })
 
@@ -26,7 +28,7 @@
 
     try {
       await register(form)
-      await navigateTo('/admin')
+      await navigateTo(redirectTo.value)
     } catch (err: any) {
       error.value = err?.data?.message || 'Nao foi possivel criar a conta.'
     } finally {

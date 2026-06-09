@@ -25,6 +25,22 @@ export type MarketplaceProduct = {
   category?: MarketplaceCategory
 }
 
+export type AbandonedCartItem = {
+  id: number
+  product_id: number
+  quantity: number
+  price: string | number
+  product: MarketplaceProduct
+}
+
+export type AbandonedCart = {
+  id: number
+  total: string | number
+  status: string
+  last_activity_at?: string | null
+  items: AbandonedCartItem[]
+}
+
 export const useMarketplaceApi = () => {
   const config = useRuntimeConfig()
   const token = useCookie<string | null>('cilios_token', {

@@ -42,6 +42,29 @@
     ).catch(() => []),
   )
 
+  const {
+    items: cartItems,
+    drawerOpen,
+    loading: cartLoading,
+    error: cartError,
+    count: cartCount,
+    total: cartTotal,
+    money,
+    loadLocal,
+    loadRemote,
+    addItem,
+    updateQuantity,
+    clearCart,
+    checkout,
+  } = useAbandonedCart()
+
+  const checkoutStatus = ref('')
+
+  onMounted(async () => {
+    loadLocal()
+    await loadRemote()
+  })
+
   const categories = computed(() =>
     apiCategories.value?.length
       ? apiCategories.value.map((category) => category.name)
@@ -142,27 +165,36 @@
     },
   ]
 
-  const money = (value: string | number) =>
-    new Intl.NumberFormat('pt-BR', {
-      style: 'currency',
-      currency: 'BRL',
-    }).format(Number(value))
-
   const products = computed(() => {
     if (!apiProducts.value?.length) {
       return fallbackProducts
     }
 
     return apiProducts.value.map((product) => ({
+      id: product.id,
       name: product.name,
       price: money(product.price),
+      rawPrice: product.price,
       installment: `6x de ${money(Number(product.price) / 6)} sem juros`,
       image: product.image || '',
       position: 'center',
       size: 'contain',
       rating: 5,
+      source: product,
     }))
   })
+
+  const addProductToCart = async (product: any) => {
+    if (!product.source) return
+    checkoutStatus.value = ''
+    await addItem(product.source)
+  }
+
+  const finishCheckout = async () => {
+    checkoutStatus.value = ''
+    const order = await checkout()
+    if (order) checkoutStatus.value = 'Pedido criado com sucesso.'
+  }
 </script>
 
 <template>
@@ -210,12 +242,17 @@
             </span>
           </NuxtLink>
 
-          <button class="relative text-slate-900" type="button" aria-label="Carrinho">
+          <button
+            class="relative text-slate-900"
+            type="button"
+            aria-label="Carrinho"
+            @click="drawerOpen = true"
+          >
             <span class="i-lucide-shopping-cart h-9 w-9"></span>
             <span
               class="absolute -right-3 -top-3 flex h-6 w-6 items-center justify-center rounded-full bg-[#d72d91] text-xs font-bold text-white"
             >
-              0
+              {{ cartCount }}
             </span>
           </button>
         </div>
@@ -358,10 +395,131 @@
                 ]"
               ></span>
             </div>
+            <button
+              v-if="product.source"
+              class="mt-4 flex h-10 w-full items-center justify-center gap-2 rounded bg-[#d72d91] px-3 text-sm font-semibold text-white transition hover:bg-[#bf247e]"
+              type="button"
+              @click="addProductToCart(product)"
+            >
+              <span class="i-lucide-shopping-cart h-4 w-4"></span>
+              Adicionar
+            </button>
           </article>
         </div>
       </section>
     </main>
+
+    <div
+      v-if="drawerOpen"
+      class="fixed inset-0 z-40 bg-slate-950/35"
+      @click.self="drawerOpen = false"
+    >
+      <aside
+        class="ml-auto flex h-full w-full max-w-md flex-col bg-white shadow-xl"
+        aria-label="Carrinho"
+      >
+        <header class="flex items-center justify-between border-b border-slate-200 px-5 py-4">
+          <div>
+            <h2 class="text-lg font-bold text-slate-950">Carrinho</h2>
+            <p class="text-sm text-slate-500">{{ cartCount }} item(ns)</p>
+          </div>
+          <button
+            class="flex h-10 w-10 items-center justify-center rounded border border-slate-200 text-slate-600 hover:bg-slate-50"
+            type="button"
+            aria-label="Fechar carrinho"
+            @click="drawerOpen = false"
+          >
+            <span class="i-lucide-x h-5 w-5"></span>
+          </button>
+        </header>
+
+        <div class="min-h-0 flex-1 overflow-y-auto px-5 py-4">
+          <p
+            v-if="checkoutStatus"
+            class="mb-4 rounded border border-emerald-200 bg-emerald-50 px-3 py-2 text-sm text-emerald-700"
+          >
+            {{ checkoutStatus }}
+          </p>
+          <p
+            v-if="cartError"
+            class="mb-4 rounded border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700"
+          >
+            {{ cartError }}
+          </p>
+
+          <div v-if="!cartItems.length" class="py-12 text-center text-sm text-slate-500">
+            Seu carrinho esta vazio.
+          </div>
+
+          <article
+            v-for="item in cartItems"
+            :key="item.product.id"
+            class="flex gap-4 border-b border-slate-100 py-4 last:border-b-0"
+          >
+            <img
+              :src="item.product.image || bannerImage"
+              :alt="item.product.name"
+              class="h-20 w-20 rounded border border-slate-100 object-contain"
+            />
+            <div class="min-w-0 flex-1">
+              <h3 class="line-clamp-2 text-sm font-semibold text-slate-800">
+                {{ item.product.name }}
+              </h3>
+              <p class="mt-1 text-sm font-bold text-slate-950">
+                {{ money(item.product.price) }}
+              </p>
+              <div class="mt-3 flex items-center gap-2">
+                <button
+                  class="flex h-8 w-8 items-center justify-center rounded border border-slate-200 hover:bg-slate-50"
+                  type="button"
+                  aria-label="Diminuir quantidade"
+                  @click="updateQuantity(item.product.id, item.quantity - 1)"
+                >
+                  <span class="i-lucide-minus h-4 w-4"></span>
+                </button>
+                <span class="w-8 text-center text-sm font-semibold">
+                  {{ item.quantity }}
+                </span>
+                <button
+                  class="flex h-8 w-8 items-center justify-center rounded border border-slate-200 hover:bg-slate-50"
+                  type="button"
+                  aria-label="Aumentar quantidade"
+                  @click="updateQuantity(item.product.id, item.quantity + 1)"
+                >
+                  <span class="i-lucide-plus h-4 w-4"></span>
+                </button>
+              </div>
+            </div>
+          </article>
+        </div>
+
+        <footer class="border-t border-slate-200 px-5 py-4">
+          <div class="mb-4 flex items-center justify-between text-base font-bold">
+            <span>Total</span>
+            <span>{{ money(cartTotal) }}</span>
+          </div>
+          <div class="grid grid-cols-[auto_minmax(0,1fr)] gap-3">
+            <button
+              class="flex h-11 w-11 items-center justify-center rounded border border-slate-300 text-slate-600 hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-50"
+              type="button"
+              aria-label="Limpar carrinho"
+              :disabled="cartLoading || !cartItems.length"
+              @click="clearCart"
+            >
+              <span class="i-lucide-trash-2 h-5 w-5"></span>
+            </button>
+            <button
+              class="h-11 rounded bg-[#d72d91] px-4 text-sm font-semibold text-white transition hover:bg-[#bf247e] disabled:cursor-not-allowed disabled:opacity-60"
+              type="button"
+              :disabled="cartLoading || !cartItems.length"
+              @click="finishCheckout"
+            >
+              {{ cartLoading ? 'Finalizando...' : 'Finalizar pedido' }}
+            </button>
+          </div>
+        </footer>
+      </aside>
+    </div>
 
     <NuxtLink
       to="/contact-us"

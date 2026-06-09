@@ -5,6 +5,8 @@
   })
 
   const { login, token } = useMarketplaceApi()
+  const route = useRoute()
+  const redirectTo = computed(() => route.query.redirect?.toString() || '/admin')
   const form = reactive({
     email: '',
     password: '',
@@ -14,7 +16,7 @@
 
   onMounted(() => {
     if (token.value) {
-      navigateTo('/admin')
+      navigateTo(redirectTo.value)
     }
   })
 
@@ -24,7 +26,7 @@
 
     try {
       await login(form.email, form.password)
-      await navigateTo('/admin')
+      await navigateTo(redirectTo.value)
     } catch (err: any) {
       error.value =
         err?.data?.message || err?.data?.errors?.email?.[0] || 'Nao foi possivel entrar.'
