@@ -1,11 +1,18 @@
 import type {
   AbandonedCart,
+  MarketplaceOrder,
   MarketplaceProduct,
 } from '@/composables/marketplace-api'
 
 type CartItem = {
   product: MarketplaceProduct
   quantity: number
+}
+
+type CheckoutOptions = {
+  coupon_code?: string
+  payment_method?: string
+  user_address_id?: number
 }
 
 const storageKey = 'cilios_abandoned_cart'
@@ -87,7 +94,8 @@ export const useAbandonedCart = () => {
         await syncRemote()
       }
     } catch (err: any) {
-      error.value = err?.data?.message || 'Nao foi possivel carregar o carrinho.'
+      error.value =
+        err?.data?.message || 'Nao foi possivel carregar o carrinho.'
     } finally {
       loading.value = false
     }
@@ -111,7 +119,9 @@ export const useAbandonedCart = () => {
     if (quantity <= 0) {
       items.value = items.value.filter((item) => item.product.id !== productId)
     } else {
-      const item = items.value.find((cartItem) => cartItem.product.id === productId)
+      const item = items.value.find(
+        (cartItem) => cartItem.product.id === productId,
+      )
       if (item) item.quantity = quantity
     }
 
@@ -130,11 +140,14 @@ export const useAbandonedCart = () => {
     }
   }
 
-  const checkout = async () => {
+  const checkout = async (options: CheckoutOptions = {}) => {
     if (!items.value.length) return null
 
     if (!token.value) {
-      await navigateTo({ path: '/login', query: { redirect: '/' } })
+      await navigateTo({
+        path: '/login',
+        query: { redirect: '/order-history' },
+      })
       return null
     }
 
@@ -142,9 +155,12 @@ export const useAbandonedCart = () => {
     error.value = ''
 
     try {
-      const order = await request('/orders', {
+      const order = await request<MarketplaceOrder>('/orders', {
         method: 'POST',
-        body: payload(),
+        body: {
+          ...payload(),
+          ...options,
+        },
       })
       items.value = []
       persistLocal()

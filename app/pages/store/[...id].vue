@@ -109,7 +109,9 @@
     }).format(date)
   })
 
-  const canBuy = computed(() => stock.value > 0 && product.value.status === 'active')
+  const canBuy = computed(
+    () => stock.value > 0 && product.value.status === 'active',
+  )
 
   const changeQuantity = (amount: number) => {
     quantity.value = Math.min(
@@ -142,10 +144,18 @@
 <template>
   <div class="min-h-screen bg-[#f5f5f5] text-slate-900">
     <header class="border-b border-slate-200 bg-white">
-      <div class="mx-auto flex max-w-7xl items-center justify-between px-4 py-4 md:px-6">
+      <div
+        class="mx-auto flex max-w-7xl items-center justify-between px-4 py-4 md:px-6"
+      >
         <NuxtLink to="/" class="flex items-center gap-3">
-          <img :src="logoImage" alt="Cilios Marketplace" class="h-14 w-32 object-contain" />
-          <span class="hidden text-lg font-bold text-[#d72d91] sm:inline">Comprar</span>
+          <img
+            :src="logoImage"
+            alt="Cilios Marketplace"
+            class="h-14 w-32 object-contain"
+          />
+          <span class="hidden text-lg font-bold text-[#d72d91] sm:inline"
+            >Comprar</span
+          >
         </NuxtLink>
         <button
           class="relative flex h-11 w-11 items-center justify-center rounded border border-slate-200"
@@ -154,7 +164,9 @@
           @click="drawerOpen = true"
         >
           <span class="i-lucide-shopping-cart h-6 w-6"></span>
-          <span class="absolute -right-2 -top-2 flex h-5 min-w-5 items-center justify-center rounded-full bg-[#d72d91] px-1 text-xs font-bold text-white">
+          <span
+            class="absolute -right-2 -top-2 flex h-5 min-w-5 items-center justify-center rounded-full bg-[#d72d91] px-1 text-xs font-bold text-white"
+          >
             {{ cartCount }}
           </span>
         </button>
@@ -162,7 +174,9 @@
     </header>
 
     <main class="mx-auto max-w-7xl px-4 py-6 md:px-6">
-      <section class="grid gap-6 bg-white p-4 shadow-sm md:grid-cols-[480px_minmax(0,1fr)] md:p-6">
+      <section
+        class="grid gap-6 bg-white p-4 shadow-sm md:grid-cols-[480px_minmax(0,1fr)] md:p-6"
+      >
         <div>
           <div class="flex min-h-[360px] items-center justify-center bg-white">
             <img
@@ -177,18 +191,32 @@
               :key="`${image}-${index}`"
               type="button"
               class="flex aspect-square items-center justify-center border bg-white p-1"
-              :class="activeImage === index ? 'border-[#d72d91]' : 'border-slate-200'"
+              :class="
+                activeImage === index ? 'border-[#d72d91]' : 'border-slate-200'
+              "
               @click="activeImage = index"
             >
-              <img :src="image" :alt="`${product.name} ${index + 1}`" class="h-full w-full object-contain" />
+              <img
+                :src="image"
+                :alt="`${product.name} ${index + 1}`"
+                class="h-full w-full object-contain"
+              />
             </button>
           </div>
           <div class="mt-5 flex flex-wrap items-center gap-4 text-sm">
             <span class="text-slate-600">Compartilhar:</span>
-            <button class="flex h-8 w-8 items-center justify-center rounded-full bg-blue-600 text-white" type="button" aria-label="Compartilhar">
+            <button
+              class="flex h-8 w-8 items-center justify-center rounded-full bg-blue-600 text-white"
+              type="button"
+              aria-label="Compartilhar"
+            >
               <span class="i-lucide-send h-4 w-4"></span>
             </button>
-            <button class="flex h-8 w-8 items-center justify-center rounded-full bg-[#d72d91] text-white" type="button" aria-label="Favoritar">
+            <button
+              class="flex h-8 w-8 items-center justify-center rounded-full bg-[#d72d91] text-white"
+              type="button"
+              aria-label="Favoritar"
+            >
               <span class="i-lucide-heart h-4 w-4"></span>
             </button>
             <span class="text-slate-600">Favoritar</span>
@@ -203,18 +231,27 @@
             >
               Oficial
             </span>
-            <h1 class="min-w-0 flex-1 text-xl font-semibold leading-snug md:text-2xl">
+            <h1
+              class="min-w-0 flex-1 text-xl font-semibold leading-snug md:text-2xl"
+            >
               {{ product.name }}
             </h1>
           </div>
 
           <div class="mt-3 flex flex-wrap items-center gap-3 text-sm">
-            <span class="font-semibold text-[#d72d91]">{{ rating.toFixed(1) }}</span>
+            <span class="font-semibold text-[#d72d91]">{{
+              rating.toFixed(1)
+            }}</span>
             <span class="flex text-[#f2a32b]">
               <span
                 v-for="star in 5"
                 :key="star"
-                :class="[star <= Math.round(rating) ? 'i-lucide-star fill-current' : 'i-lucide-star', 'h-4 w-4']"
+                :class="[
+                  star <= Math.round(rating)
+                    ? 'i-lucide-star fill-current'
+                    : 'i-lucide-star',
+                  'h-4 w-4',
+                ]"
               ></span>
             </span>
             <span class="h-4 w-px bg-slate-200"></span>
@@ -225,7 +262,9 @@
           </div>
 
           <div class="mt-5 overflow-hidden rounded-sm bg-[#fff0ec]">
-            <div class="flex items-center justify-between bg-[#ff572f] px-4 py-2 text-sm font-bold text-white">
+            <div
+              class="flex items-center justify-between bg-[#ff572f] px-4 py-2 text-sm font-bold text-white"
+            >
               <span>OFERTAS RELAMPAGO</span>
               <span class="flex items-center gap-1">
                 <span class="i-lucide-clock h-4 w-4"></span>
@@ -236,11 +275,19 @@
               </span>
             </div>
             <div class="flex flex-wrap items-end gap-3 px-5 py-5">
-              <span class="text-3xl font-bold text-[#d72d91]">{{ money(product.price) }}</span>
-              <span v-if="hasDiscount" class="text-sm text-slate-400 line-through">
+              <span class="text-3xl font-bold text-[#d72d91]">{{
+                money(product.price)
+              }}</span>
+              <span
+                v-if="hasDiscount"
+                class="text-sm text-slate-400 line-through"
+              >
                 {{ money(product.original_price || 0) }}
               </span>
-              <span v-if="hasDiscount" class="rounded-sm bg-white px-2 py-1 text-xs font-bold text-[#d72d91]">
+              <span
+                v-if="hasDiscount"
+                class="rounded-sm bg-white px-2 py-1 text-xs font-bold text-[#d72d91]"
+              >
                 -{{ discountPercent }}%
               </span>
             </div>
@@ -251,7 +298,8 @@
               <span class="text-slate-500">Moedas</span>
               <span class="flex items-center gap-2">
                 <span class="i-lucide-coins h-5 w-5 text-amber-500"></span>
-                Compre e ganhe {{ Math.max(1, Math.floor(Number(product.price))) }} moeda(s)
+                Compre e ganhe
+                {{ Math.max(1, Math.floor(Number(product.price))) }} moeda(s)
               </span>
             </div>
 
@@ -262,7 +310,9 @@
                   <span class="i-lucide-truck h-5 w-5"></span>
                   Chega ate {{ shippingDate }}, Full
                 </p>
-                <p class="text-xs text-slate-500">Estocado e entregue pelo marketplace</p>
+                <p class="text-xs text-slate-500">
+                  Estocado e entregue pelo marketplace
+                </p>
                 <p><span class="font-semibold">Sao Paulo, Sao Paulo</span></p>
                 <p>
                   <span class="mr-2 text-slate-400 line-through">R$8,39</span>
@@ -272,11 +322,19 @@
               </div>
             </div>
 
-            <div class="grid items-center gap-2 sm:grid-cols-[92px_minmax(0,1fr)]">
+            <div
+              class="grid items-center gap-2 sm:grid-cols-[92px_minmax(0,1fr)]"
+            >
               <span class="text-slate-500">Quantidade</span>
               <div class="flex flex-wrap items-center gap-3">
                 <div class="grid h-10 grid-cols-3 border border-slate-200">
-                  <button class="w-10 text-slate-500 hover:bg-slate-50" type="button" @click="changeQuantity(-1)">-</button>
+                  <button
+                    class="w-10 text-slate-500 hover:bg-slate-50"
+                    type="button"
+                    @click="changeQuantity(-1)"
+                  >
+                    -
+                  </button>
                   <input
                     v-model.number="quantity"
                     class="w-12 border-x border-slate-200 text-center text-[#d72d91] outline-none"
@@ -284,17 +342,31 @@
                     min="1"
                     :max="Math.max(1, stock)"
                   />
-                  <button class="w-10 text-slate-500 hover:bg-slate-50" type="button" @click="changeQuantity(1)">+</button>
+                  <button
+                    class="w-10 text-slate-500 hover:bg-slate-50"
+                    type="button"
+                    @click="changeQuantity(1)"
+                  >
+                    +
+                  </button>
                 </div>
-                <span class="text-xs text-slate-500">{{ stock }} disponiveis</span>
+                <span class="text-xs text-slate-500"
+                  >{{ stock }} disponiveis</span
+                >
               </div>
             </div>
           </div>
 
-          <p v-if="status" class="mt-5 rounded border border-emerald-200 bg-emerald-50 px-3 py-2 text-sm text-emerald-700">
+          <p
+            v-if="status"
+            class="mt-5 rounded border border-emerald-200 bg-emerald-50 px-3 py-2 text-sm text-emerald-700"
+          >
             {{ status }}
           </p>
-          <p v-if="cartError" class="mt-5 rounded border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">
+          <p
+            v-if="cartError"
+            class="mt-5 rounded border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700"
+          >
             {{ cartError }}
           </p>
 
@@ -320,12 +392,19 @@
 
           <section class="mt-8 border-t border-slate-100 pt-5">
             <h2 class="text-base font-bold">Descricao do produto</h2>
-            <p class="mt-2 whitespace-pre-line text-sm leading-6 text-slate-600">
-              {{ product.description || 'Produto profissional para lash designers.' }}
+            <p
+              class="mt-2 whitespace-pre-line text-sm leading-6 text-slate-600"
+            >
+              {{
+                product.description ||
+                'Produto profissional para lash designers.'
+              }}
             </p>
           </section>
         </div>
       </section>
     </main>
+
+    <CartDrawer />
   </div>
 </template>

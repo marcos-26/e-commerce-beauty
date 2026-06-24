@@ -3,72 +3,71 @@
 // @unocss-include
 
 export default {
-  title: 'NuCommerce',
+  title: 'Cilios Marketplace',
   description:
-    'Vue Designer Nuxt Tailwind CSS / Nuxt UI - Quick start template',
+    'Marketplace de produtos profissionais para extensao e cuidado dos cilios.',
   logo: 'i-fluent-emoji:shopping-bags',
-  author: 'Pinegrow',
-  url: 'https://pg-nuxtui.netlify.app',
-  github: 'https://github.com/pinegrow/pg-nuxtui',
+  author: 'Cilios Marketplace',
+  url: 'http://localhost:3000',
+  github: '',
   ogImageUrl: 'og-image.jpg', // absolute url (or) from public folder
-  generator: 'https://vuedesigner.com',
-  defaultLocale: 'en', // default
+  generator: 'Cilios Marketplace',
+  defaultLocale: 'pt-BR', // default
   identity: {
     type: 'Organization',
   } as any,
-  twitter: '@vuedesigner',
+  twitter: '',
   trailingSlash: false, // default
   titleSeparator: '|', // default
 
   navs: {
     primary: [
-      { title: 'Home', to: '/', icon: 'i-mdi-home' },
-      { title: 'Women', to: '/women', icon: 'i-mdi-home' },
-      { title: 'Men', to: '/men', icon: 'i-mdi-home' },
+      { title: 'Inicio', to: '/', icon: 'i-mdi-home' },
+      { title: 'Produtos', to: '/', icon: 'i-mdi-home' },
       {
-        title: 'Jewellery',
-        to: '/jewellery',
-        icon: 'i-mdi-home',
-      },
-      {
-        title: 'Electronics',
-        to: '/electronics',
-        icon: 'i-mdi-home',
-      },
-      {
-        title: 'About Us',
-        to: '/quick-start',
-        icon: 'i-mdi-home',
-      },
-    ],
-    secondary: [
-      {
-        title: 'Track Order',
-        to: '/track-order',
-        icon: 'i-ic-outline-my-location',
-      },
-      {
-        title: 'Order History',
+        title: 'Meus pedidos',
         to: '/order-history',
         icon: 'i-ic-baseline-history',
       },
       {
-        title: 'Returns',
+        title: 'Rastrear',
+        to: '/track-order',
+        icon: 'i-ic-outline-my-location',
+      },
+      {
+        title: 'Atendimento',
+        to: '/contact-us',
+        icon: 'i-material-symbols-add-call',
+      },
+    ],
+    secondary: [
+      {
+        title: 'Rastrear pedido',
+        to: '/track-order',
+        icon: 'i-ic-outline-my-location',
+      },
+      {
+        title: 'Meus pedidos',
+        to: '/order-history',
+        icon: 'i-ic-baseline-history',
+      },
+      {
+        title: 'Trocas e devolucoes',
         to: '/returns',
         icon: 'i-material-symbols-assignment-return-outline-rounded',
       },
       {
-        title: 'Delivery Policy',
+        title: 'Politica de entrega',
         to: '/delivery-policy',
         icon: 'i-tabler-truck-return',
       },
       {
-        title: 'Contact Us',
+        title: 'Contato',
         to: '/contact-us',
         icon: 'i-material-symbols-add-call',
       },
       {
-        title: 'Help & FAQs',
+        title: 'Ajuda e FAQs',
         to: '/help-faqs',
         icon: 'i-material-symbols-contact-support-outline',
       },

@@ -1,4 +1,4 @@
-type ApiUser = {
+export type ApiUser = {
   id: number
   name: string
   email: string
@@ -61,6 +61,49 @@ export type AbandonedCart = {
   status: string
   last_activity_at?: string | null
   items: AbandonedCartItem[]
+}
+
+export type MarketplaceOrderItem = {
+  id: number
+  product_id: number
+  quantity: number
+  price: string | number
+  product?: MarketplaceProduct | null
+}
+
+export type MarketplaceOrder = {
+  id: number
+  total: string | number
+  subtotal?: string | number | null
+  discount_total?: string | number | null
+  shipping_total?: string | number | null
+  status: string
+  payment_method?: string | null
+  payment_status?: string | null
+  coupon_code?: string | null
+  created_at?: string | null
+  updated_at?: string | null
+  items: MarketplaceOrderItem[]
+  address?: {
+    id: number
+    recipient_name?: string | null
+    street?: string | null
+    number?: string | null
+    city?: string | null
+    state?: string | null
+    zip_code?: string | null
+  } | null
+}
+
+export type CouponApplyResponse = {
+  coupon: {
+    id: number
+    code: string
+    description?: string | null
+    type: string
+    value: string | number
+  }
+  discount: string | number
 }
 
 export const useMarketplaceApi = () => {
