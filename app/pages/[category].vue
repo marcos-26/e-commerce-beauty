@@ -1,19 +1,14 @@
 <script setup lang="ts">
   const route = useRoute()
 
-  const categoriesBySlug: Record<string, string> = {
-    'alongamento-de-cilios': 'Alongamento de Cilios',
-    kits: 'Kits',
-    pincas: 'Pincas',
-    colas: 'Colas',
-    removedores: 'Removedores',
-    higiene: 'Higiene',
-    acessorios: 'Acessorios',
-    ofertas: 'Ofertas',
-  }
-
   const routeSlug = computed(() => String(route.params.category || ''))
-  const currentCategory = computed(() => categoriesBySlug[routeSlug.value] || '')
+  const pageTitle = computed(() =>
+    routeSlug.value
+      .split('-')
+      .filter(Boolean)
+      .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+      .join(' '),
+  )
 
   definePageMeta({
     layout: false,
@@ -23,8 +18,8 @@
 
   useHead({
     title: () =>
-      currentCategory.value
-        ? `${currentCategory.value} | Cilios Marketplace`
+      pageTitle.value
+        ? `${pageTitle.value} | Cilios Marketplace`
         : 'Categoria | Cilios Marketplace',
     bodyAttrs: {
       class: 'bg-[#f6f8fd]',
@@ -33,5 +28,5 @@
 </script>
 
 <template>
-  <MarketplaceStorefront :initial-category="currentCategory" />
+  <MarketplaceStorefront :initial-category-slug="routeSlug" />
 </template>

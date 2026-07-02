@@ -39,6 +39,17 @@ export type MarketplaceProduct = {
   } | null
 }
 
+export type CmsBanner = {
+  id: number
+  title: string
+  subtitle?: string | null
+  image: string
+  link_url?: string | null
+  placement?: string
+  sort_order?: number
+  is_active?: boolean
+}
+
 export type PaginatedResponse<T> = {
   data: T[]
   current_page: number

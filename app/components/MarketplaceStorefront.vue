@@ -1,5 +1,6 @@
 <script setup lang="ts">
   import type {
+    CmsBanner,
     MarketplaceCategory,
     PaginatedResponse,
     MarketplaceProduct,
@@ -8,8 +9,12 @@
   import bannerImage2 from '@/assets/images/banner2.png'
   import logoImage from '@/assets/images/logo.png'
 
-  const props = withDefaults(defineProps<{ initialCategory?: string }>(), {
+  const props = withDefaults(defineProps<{
+    initialCategory?: string
+    initialCategorySlug?: string
+  }>(), {
     initialCategory: '',
+    initialCategorySlug: '',
   })
 
   const fallbackCategories = [
@@ -20,7 +25,7 @@
     'Removedores',
     'Higiene',
     'Acessorios',
-    'Outros',
+    'Ofertas',
   ]
 
   const { data: apiCategories } = await useAsyncData(
@@ -37,6 +42,12 @@
       $fetch<MarketplaceProduct[] | PaginatedResponse<MarketplaceProduct>>(
         `${useRuntimeConfig().public.apiBase}/products`,
       ).catch(() => []),
+  )
+
+  const { data: apiBanners } = await useAsyncData('marketplace-home-banners', () =>
+    $fetch<CmsBanner[]>(
+      `${useRuntimeConfig().public.apiBase}/banners?placement=home`,
+    ).catch(() => []),
   )
 
   const apiProducts = computed(() =>
@@ -60,7 +71,7 @@
   })
 
   const searchTerm = ref('')
-  const selectedCategory = ref(props.initialCategory)
+  const selectedCategory = ref('')
 
   const normalizeText = (value: string | number | null | undefined) =>
     String(value || '')
@@ -68,11 +79,27 @@
       .replace(/[\u0300-\u036f]/g, '')
       .toLowerCase()
 
+  const slugifyCategory = (category: string) =>
+    normalizeText(category)
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/^-|-$/g, '')
+
   const categories = computed(() =>
     apiCategories.value?.length
       ? apiCategories.value.map((category) => category.name)
       : fallbackCategories,
   )
+
+  const routeCategory = computed(() => {
+    if (props.initialCategory) return props.initialCategory
+    if (!props.initialCategorySlug) return ''
+
+    return (
+      categories.value.find(
+        (category) => slugifyCategory(category) === props.initialCategorySlug,
+      ) || ''
+    )
+  })
 
   const categoryOptions: Record<string, string[]> = {
     'Alongamento de Cilios': [
@@ -147,51 +174,61 @@
   const expandedCategory = ref(fallbackCategories[0])
 
   const optionsForCategory = (category: string) =>
-    categoryOptions[category] || categoryOptions.Outros
+    dynamicOptionsByCategory.value[category]?.length
+      ? dynamicOptionsByCategory.value[category].slice(0, 8)
+      : categoryOptions[category] || categoryOptions.Outros
 
   const categorySlugOverrides: Record<string, string> = {
     'Alongamento de Cilios': 'alongamento-de-cilios',
-    Kits: 'kits',
-    Pincas: 'pincas',
-    Colas: 'colas',
-    Removedores: 'removedores',
-    Higiene: 'higiene',
-    Acessorios: 'acessorios',
     Ofertas: 'ofertas',
   }
-
-  const slugifyCategory = (category: string) =>
-    normalizeText(category)
-      .replace(/[^a-z0-9]+/g, '-')
-      .replace(/^-|-$/g, '')
 
   const categoryPath = (category: string) =>
     category === 'Inicio'
       ? '/'
       : `/${categorySlugOverrides[category] || slugifyCategory(category)}`
 
-  const navItems = computed(() => [...categories.value.slice(0, 7), 'Ofertas'])
+  const navItems = computed(() => [
+    ...categories.value
+      .filter((category) => normalizeText(category) !== 'ofertas')
+      .slice(0, 7),
+    'Ofertas',
+  ])
 
   const activeHeroSlide = ref(0)
 
-  const heroSlides = [
+  const fallbackHeroSlides = [
     {
       image: bannerImage,
       alt: 'Tudo para realcar a beleza do olhar',
+      linkUrl: categoryPath('Ofertas'),
     },
     {
       image: bannerImage2,
       alt: 'Ofertas especiais para cilios',
+      linkUrl: categoryPath('Ofertas'),
     },
     {
       image: bannerImage,
       alt: 'Produtos para alongamento de cilios',
+      linkUrl: categoryPath('Alongamento de Cilios'),
     },
     {
       image: bannerImage2,
       alt: 'Cilios Marketplace',
+      linkUrl: categoryPath('Ofertas'),
     },
   ]
+
+  const heroSlides = computed(() => {
+    if (!apiBanners.value?.length) return fallbackHeroSlides
+
+    return apiBanners.value.map((banner) => ({
+      image: banner.image,
+      alt: banner.subtitle || banner.title,
+      linkUrl: banner.link_url || categoryPath('Ofertas'),
+    }))
+  })
 
   const benefits = [
     {
@@ -306,6 +343,20 @@
     })
   })
 
+  const dynamicOptionsByCategory = computed(() =>
+    products.value.reduce<Record<string, string[]>>((options, product) => {
+      if (!product.category || !product.name) return options
+
+      options[product.category] ||= []
+
+      if (!options[product.category].includes(product.name)) {
+        options[product.category].push(product.name)
+      }
+
+      return options
+    }, {}),
+  )
+
   const matchesCategory = (product: any, category: string) => {
     if (!category) return true
 
@@ -355,6 +406,19 @@
   const productPath = (product: any) =>
     `/store/${product.id || product.source?.id}`
 
+  const openHeroLink = () => {
+    const linkUrl = heroSlides.value[activeHeroSlide.value]?.linkUrl
+
+    if (!linkUrl) {
+      navigateTo(categoryPath('Ofertas'))
+      return
+    }
+
+    navigateTo(linkUrl, {
+      external: /^https?:\/\//.test(linkUrl),
+    })
+  }
+
   const selectCategory = (category: string) => {
     selectedCategory.value = category
     searchTerm.value = ''
@@ -382,12 +446,13 @@
       : selectedCategory.value === item
 
   watch(
-    () => props.initialCategory,
+    routeCategory,
     (category) => {
       selectedCategory.value = category
       expandedCategory.value = category || fallbackCategories[0]
       searchTerm.value = ''
     },
+    { immediate: true },
   )
 </script>
 
@@ -542,7 +607,7 @@
             <button
               type="button"
               class="absolute bottom-[13%] left-[5%] rounded bg-[#d72d91] px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-[#bf247e]"
-              @click="selectCategory('Ofertas')"
+              @click="openHeroLink"
             >
               COMPRE AGORA
             </button>
