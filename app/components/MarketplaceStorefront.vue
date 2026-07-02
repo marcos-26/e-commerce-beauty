@@ -28,26 +28,48 @@
     'Ofertas',
   ]
 
-  const { data: apiCategories } = await useAsyncData(
+  const apiBase = useRuntimeConfig().public.apiBase
+
+  const { data: apiCategories } = useAsyncData(
     'marketplace-categories',
     () =>
-      $fetch<MarketplaceCategory[]>(
-        `${useRuntimeConfig().public.apiBase}/categories`,
-      ).catch(() => []),
+      $fetch<MarketplaceCategory[]>(`${apiBase}/categories`, {
+        timeout: 3000,
+      }).catch(() => []),
+    {
+      default: () => [],
+      lazy: true,
+      server: false,
+    },
   )
 
-  const { data: apiProductsResponse } = await useAsyncData(
+  const { data: apiProductsResponse } = useAsyncData(
     'marketplace-products',
     () =>
       $fetch<MarketplaceProduct[] | PaginatedResponse<MarketplaceProduct>>(
-        `${useRuntimeConfig().public.apiBase}/products`,
+        `${apiBase}/products`,
+        {
+          timeout: 3000,
+        },
       ).catch(() => []),
+    {
+      default: () => [],
+      lazy: true,
+      server: false,
+    },
   )
 
-  const { data: apiBanners } = await useAsyncData('marketplace-home-banners', () =>
-    $fetch<CmsBanner[]>(
-      `${useRuntimeConfig().public.apiBase}/banners?placement=home`,
-    ).catch(() => []),
+  const { data: apiBanners } = useAsyncData(
+    'marketplace-home-banners',
+    () =>
+      $fetch<CmsBanner[]>(`${apiBase}/banners?placement=home`, {
+        timeout: 3000,
+      }).catch(() => []),
+    {
+      default: () => [],
+      lazy: true,
+      server: false,
+    },
   )
 
   const apiProducts = computed(() =>
